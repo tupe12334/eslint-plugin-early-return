@@ -11,7 +11,8 @@
     "tsconfig",
     "esbenp",
     "eslintplugin",
-    "commitlint"
+    "commitlint",
+    "hyoban"
   ],
   "languageSettings": [
     {
