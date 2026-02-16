@@ -10,7 +10,9 @@
       "Bash(git push:*)",
       "Bash(npm whoami:*)",
       "Bash(gh run list:*)",
-      "Bash(gh run view:*)"
+      "Bash(gh run view:*)",
+      "Bash(npm view:*)",
+      "Bash(gh run watch:*)"
     ],
     "deny": ["Bash(npm publish:*)"]
   }
