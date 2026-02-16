@@ -17,7 +17,10 @@
       "Bash(centy llm:*)",
       "Bash(centy create --help:*)",
       "Bash(centy create issue --help:*)",
-      "Bash(centy create issue:*)"
+      "Bash(centy create issue:*)",
+      "Bash(git checkout:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr merge:*)"
     ],
     "deny": [
       "Bash(npm publish:*)",
