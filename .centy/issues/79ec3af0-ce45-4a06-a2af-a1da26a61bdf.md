@@ -1,6 +1,6 @@
 ---
 displayNumber: 2
-status: open
+status: in-progress
 priority: 1
 createdAt: 2026-02-16T14:16:06.038572+00:00
 updatedAt: 2026-02-16T14:16:06.038572+00:00

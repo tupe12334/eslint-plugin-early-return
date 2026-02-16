@@ -1,3 +1,4 @@
+import preferEarlyContinue from './rules/prefer-early-continue.js'
 import preferEarlyReturn from './rules/prefer-early-return.js'
 
 interface EarlyReturnPlugin {
@@ -15,6 +16,7 @@ const plugin: EarlyReturnPlugin = {
     version: '0.0.0',
   },
   rules: {
+    'prefer-early-continue': preferEarlyContinue,
     'prefer-early-return': preferEarlyReturn,
   },
   configs: {},
@@ -25,6 +27,7 @@ plugin.configs['recommended'] = {
     'early-return': plugin,
   },
   rules: {
+    'early-return/prefer-early-continue': 'error',
     'early-return/prefer-early-return': 'error',
   },
 }

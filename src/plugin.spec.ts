@@ -10,6 +10,10 @@ describe('eslint-plugin-early-return', () => {
     expect(plugin.rules['prefer-early-return']).toBeDefined()
   })
 
+  it('should export the prefer-early-continue rule', () => {
+    expect(plugin.rules['prefer-early-continue']).toBeDefined()
+  })
+
   it('should export a recommended config', () => {
     expect(plugin.configs['recommended']).toBeDefined()
   })
@@ -18,5 +22,6 @@ describe('eslint-plugin-early-return', () => {
     const config: { rules: Record<string, string> } =
       plugin.configs['recommended']
     expect(config.rules['early-return/prefer-early-return']).toBe('error')
+    expect(config.rules['early-return/prefer-early-continue']).toBe('error')
   })
 })
