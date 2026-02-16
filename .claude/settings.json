@@ -12,7 +12,12 @@
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
       "Bash(npm view:*)",
-      "Bash(gh run watch:*)"
+      "Bash(gh run watch:*)",
+      "Bash(centy --help:*)",
+      "Bash(centy llm:*)",
+      "Bash(centy create --help:*)",
+      "Bash(centy create issue --help:*)",
+      "Bash(centy create issue:*)"
     ],
     "deny": [
       "Bash(npm publish:*)",
