@@ -21,7 +21,9 @@
       "Bash(git checkout:*)",
       "Bash(gh pr create:*)",
       "Bash(gh pr merge:*)",
-      "Bash(gh pr:*)"
+      "Bash(gh pr:*)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)"
     ],
     "deny": [
       "Bash(npm publish:*)",
