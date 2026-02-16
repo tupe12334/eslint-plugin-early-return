@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-early-return",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "ESLint plugin that suggests early return patterns to improve code readability",
   "type": "module",
   "main": "./dist/index.js",
