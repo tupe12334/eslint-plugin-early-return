@@ -78,14 +78,14 @@ jobs:
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "Package: $PACKAGE_NAME@$CURRENT_VERSION"
 
-          PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME@$CURRENT_VERSION" version 2>/dev/null || echo "")
-
-          if [ -z "$PUBLISHED_VERSION" ]; then
-            echo "Version $CURRENT_VERSION not found on npm, will publish"
-            echo "should_publish=true" >> $GITHUB_OUTPUT
-          else
-            echo "Version $CURRENT_VERSION already published, skipping"
+          # Check the time field which includes all historically published versions,
+          # even ones that were later unpublished (npm blocks re-publishing those)
+          if npm view "$PACKAGE_NAME" time --json 2>/dev/null | grep -q "\"$CURRENT_VERSION\""; then
+            echo "Version $CURRENT_VERSION was previously published, skipping"
             echo "should_publish=false" >> $GITHUB_OUTPUT
+          else
+            echo "Version $CURRENT_VERSION never published, will publish"
+            echo "should_publish=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Install pnpm
