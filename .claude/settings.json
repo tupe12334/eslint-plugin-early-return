@@ -23,7 +23,8 @@
       "Bash(gh pr merge:*)",
       "Bash(gh pr:*)",
       "Bash(git fetch:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(node -p:*)"
     ],
     "deny": [
       "Bash(npm publish:*)",
