@@ -450,6 +450,53 @@ ruleTester.run('prefer-early-return', rule, {
       `,
     },
 
+    // ─── If with simple exit in if, else has single statement ──────────
+    {
+      name: 'if returns, else has only 1 statement (not worth flagging)',
+      code: `
+        function foo(x) {
+          if (!x) {
+            return null;
+          } else {
+            doA();
+          }
+        }
+      `,
+    },
+    {
+      name: 'if throws, else has only 1 statement (not worth flagging)',
+      code: `
+        function foo(x) {
+          if (!x) {
+            throw new Error('bad');
+          } else {
+            doA();
+          }
+        }
+      `,
+    },
+    {
+      name: 'if returns (no braces), else has only 1 statement',
+      code: `
+        function foo(x) {
+          if (!x) return null;
+          else {
+            doA();
+          }
+        }
+      `,
+    },
+    {
+      name: 'if returns, else has only 1 statement (no braces)',
+      code: `
+        function foo(x) {
+          if (!x) {
+            return null;
+          } else doA();
+        }
+      `,
+    },
+
     // ─── Arrow function edge cases ─────────────────────────────────────
     {
       name: 'arrow function with implicit return (no block body)',
@@ -1118,6 +1165,152 @@ ruleTester.run('prefer-early-return', rule, {
             doB();
           } else {
             return false;
+          }
+        }
+      `,
+      errors: [{ messageId: 'preferEarlyReturn' }],
+    },
+
+    // ─── If with simple exit in if, unnecessary else (new pattern) ────
+    {
+      name: 'if returns null, else has multiple statements',
+      code: `
+        function foo(x) {
+          if (!x) {
+            return null;
+          } else {
+            doA();
+            doB();
+            return result;
+          }
+        }
+      `,
+      errors: [{ messageId: 'preferEarlyReturn' }],
+    },
+    {
+      name: 'if returns (bare), else has multiple statements',
+      code: `
+        function foo(x) {
+          if (!x) {
+            return;
+          } else {
+            doA();
+            doB();
+          }
+        }
+      `,
+      errors: [{ messageId: 'preferEarlyReturn' }],
+    },
+    {
+      name: 'if throws, else has multiple statements',
+      code: `
+        function foo(x) {
+          if (!x) {
+            throw new Error('invalid');
+          } else {
+            doA();
+            doB();
+          }
+        }
+      `,
+      errors: [{ messageId: 'preferEarlyReturn' }],
+    },
+    {
+      name: 'if returns (no braces), else has multiple statements',
+      code: `
+        function foo(x) {
+          if (!x) return null;
+          else {
+            doA();
+            doB();
+          }
+        }
+      `,
+      errors: [{ messageId: 'preferEarlyReturn' }],
+    },
+    {
+      name: 'if throws (no braces), else has multiple statements',
+      code: `
+        function foo(x) {
+          if (!x) throw new Error('bad');
+          else {
+            doA();
+            doB();
+          }
+        }
+      `,
+      errors: [{ messageId: 'preferEarlyReturn' }],
+    },
+    {
+      name: 'async function with return in if, else has multiple statements',
+      code: `
+        async function foo(x) {
+          if (!x) {
+            return;
+          } else {
+            await doA();
+            doB();
+          }
+        }
+      `,
+      errors: [{ messageId: 'preferEarlyReturn' }],
+    },
+    {
+      name: 'class method with return in if, else has multiple statements',
+      code: `
+        class Foo {
+          bar(x) {
+            if (!x) {
+              return;
+            } else {
+              doA();
+              doB();
+            }
+          }
+        }
+      `,
+      errors: [{ messageId: 'preferEarlyReturn' }],
+    },
+    {
+      name: 'arrow function with return in if, else has multiple statements',
+      code: `
+        const foo = (x) => {
+          if (!x) {
+            return null;
+          } else {
+            doA();
+            doB();
+          }
+        }
+      `,
+      errors: [{ messageId: 'preferEarlyReturn' }],
+    },
+    {
+      name: 'if returns with value, else has many statements',
+      code: `
+        function foo(x) {
+          if (!x) {
+            return -1;
+          } else {
+            doA();
+            doB();
+            doC();
+            doD();
+          }
+        }
+      `,
+      errors: [{ messageId: 'preferEarlyReturn' }],
+    },
+    {
+      name: 'statements before if with return in if branch',
+      code: `
+        function foo(x) {
+          const y = getY();
+          if (!x) {
+            return null;
+          } else {
+            doA(y);
+            doB(y);
           }
         }
       `,

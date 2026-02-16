@@ -1,5 +1,46 @@
 import type { Rule } from 'eslint'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ASTNode = any
+
+function isSimpleExit(node: ASTNode): boolean {
+  if (node.type === 'ReturnStatement' || node.type === 'ThrowStatement') {
+    return true
+  }
+
+  return (
+    node.type === 'BlockStatement' &&
+    node.body.length === 1 &&
+    (node.body[0].type === 'ReturnStatement' ||
+      node.body[0].type === 'ThrowStatement')
+  )
+}
+
+function getBlockBody(node: ASTNode): ASTNode[] | undefined {
+  return node.type === 'BlockStatement' ? node.body : undefined
+}
+
+function isLastIfInFunction(node: Rule.Node): boolean {
+  const parent = node.parent
+
+  if (!parent) return false
+
+  const isInsideFunction =
+    parent.type === 'BlockStatement' &&
+    parent.parent &&
+    (parent.parent.type === 'FunctionDeclaration' ||
+      parent.parent.type === 'FunctionExpression' ||
+      parent.parent.type === 'ArrowFunctionExpression')
+
+  if (!isInsideFunction) return false
+
+  const body = getBlockBody(parent)
+  if (!body) return false
+
+  const nodeIndex = body.indexOf(node)
+  return nodeIndex === body.length - 1
+}
+
 const rule: Rule.RuleModule = {
   meta: {
     type: 'suggestion',
@@ -17,46 +58,13 @@ const rule: Rule.RuleModule = {
   create(context) {
     return {
       IfStatement(node) {
-        const parent = node.parent
+        if (!isLastIfInFunction(node)) return
 
-        if (!parent) {
-          return
-        }
-
-        const isInsideFunction =
-          parent.type === 'BlockStatement' &&
-          parent.parent &&
-          (parent.parent.type === 'FunctionDeclaration' ||
-            parent.parent.type === 'FunctionExpression' ||
-            parent.parent.type === 'ArrowFunctionExpression')
-
-        if (!isInsideFunction || !parent.parent) {
-          return
-        }
-
-        const body = parent.type === 'BlockStatement' ? parent.body : undefined
-
-        if (!body) {
-          return
-        }
-
-        const nodeIndex = body.indexOf(node)
-        const isLastStatement = nodeIndex === body.length - 1
-
-        if (!isLastStatement) {
-          return
-        }
-
-        const consequent = node.consequent
-        const blockBody =
-          consequent.type === 'BlockStatement' ? consequent.body : undefined
+        const blockBody = getBlockBody(node.consequent)
 
         if (!node.alternate) {
           if (blockBody && blockBody.length >= 2) {
-            context.report({
-              node,
-              messageId: 'preferEarlyReturn',
-            })
+            context.report({ node, messageId: 'preferEarlyReturn' })
             return
           }
 
@@ -65,29 +73,23 @@ const rule: Rule.RuleModule = {
             blockBody.length === 1 &&
             blockBody[0].type === 'IfStatement'
           ) {
-            context.report({
-              node,
-              messageId: 'preferEarlyReturn',
-            })
+            context.report({ node, messageId: 'preferEarlyReturn' })
           }
 
           return
         }
 
         const alt = node.alternate
-        const altIsSimpleExit =
-          alt.type === 'ReturnStatement' ||
-          alt.type === 'ThrowStatement' ||
-          (alt.type === 'BlockStatement' &&
-            alt.body.length === 1 &&
-            (alt.body[0].type === 'ReturnStatement' ||
-              alt.body[0].type === 'ThrowStatement'))
 
-        if (altIsSimpleExit && blockBody && blockBody.length >= 2) {
-          context.report({
-            node,
-            messageId: 'preferEarlyReturn',
-          })
+        if (isSimpleExit(alt) && blockBody && blockBody.length >= 2) {
+          context.report({ node, messageId: 'preferEarlyReturn' })
+          return
+        }
+
+        const altBody = getBlockBody(alt)
+
+        if (isSimpleExit(node.consequent) && altBody && altBody.length >= 2) {
+          context.report({ node, messageId: 'preferEarlyReturn' })
         }
       },
     }
