@@ -42,7 +42,7 @@
     "guard-clause",
     "code-quality"
   ],
-  "author": "",
+  "author": "tupe12334 <ofek.gabay.he@gmail.com>",
   "license": "MIT",
   "engines": {
     "node": ">=20.0.0"
