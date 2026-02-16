@@ -8,6 +8,22 @@ const LOOP_TYPES = new Set([
   'DoWhileStatement',
 ])
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ASTNode = any
+
+function isSimpleLoopExit(node: ASTNode): boolean {
+  if (node.type === 'ContinueStatement' || node.type === 'BreakStatement') {
+    return true
+  }
+
+  return (
+    node.type === 'BlockStatement' &&
+    node.body.length === 1 &&
+    (node.body[0].type === 'ContinueStatement' ||
+      node.body[0].type === 'BreakStatement')
+  )
+}
+
 const rule: Rule.RuleModule = {
   meta: {
     type: 'suggestion',
@@ -19,6 +35,8 @@ const rule: Rule.RuleModule = {
     messages: {
       preferEarlyContinue:
         'Consider using an early continue to reduce nesting. Invert the condition and continue early instead of wrapping the remaining code in an if block.',
+      unnecessaryElse:
+        'Unnecessary else after continue/break in loop. Remove the else block and place its contents after the if statement.',
     },
     schema: [],
   },
@@ -49,11 +67,37 @@ const rule: Rule.RuleModule = {
         const nodeIndex = body.indexOf(node)
         const isLastStatement = nodeIndex === body.length - 1
 
-        if (!isLastStatement) {
+        if (node.alternate) {
+          // If the if-branch is a simple loop exit (continue/break),
+          // the else is always unnecessary
+          if (isSimpleLoopExit(node.consequent)) {
+            context.report({
+              node,
+              messageId: 'unnecessaryElse',
+            })
+            return
+          }
+
+          // If the else-branch is a simple loop exit (continue/break),
+          // suggest inverting to use early continue/break
+          if (isSimpleLoopExit(node.alternate)) {
+            const blockBody =
+              node.consequent.type === 'BlockStatement'
+                ? node.consequent.body
+                : undefined
+
+            if (blockBody && blockBody.length >= 2) {
+              context.report({
+                node,
+                messageId: 'unnecessaryElse',
+              })
+            }
+          }
+
           return
         }
 
-        if (node.alternate) {
+        if (!isLastStatement) {
           return
         }
 
