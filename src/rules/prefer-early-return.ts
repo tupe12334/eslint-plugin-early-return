@@ -34,10 +34,6 @@ const rule: Rule.RuleModule = {
           return
         }
 
-        if (node.alternate) {
-          return
-        }
-
         const body = parent.type === 'BlockStatement' ? parent.body : undefined
 
         if (!body) {
@@ -55,14 +51,44 @@ const rule: Rule.RuleModule = {
         const blockBody =
           consequent.type === 'BlockStatement' ? consequent.body : undefined
 
-        if (!blockBody || blockBody.length < 2) {
+        if (!node.alternate) {
+          if (blockBody && blockBody.length >= 2) {
+            context.report({
+              node,
+              messageId: 'preferEarlyReturn',
+            })
+            return
+          }
+
+          if (
+            blockBody &&
+            blockBody.length === 1 &&
+            blockBody[0].type === 'IfStatement'
+          ) {
+            context.report({
+              node,
+              messageId: 'preferEarlyReturn',
+            })
+          }
+
           return
         }
 
-        context.report({
-          node,
-          messageId: 'preferEarlyReturn',
-        })
+        const alt = node.alternate
+        const altIsSimpleExit =
+          alt.type === 'ReturnStatement' ||
+          alt.type === 'ThrowStatement' ||
+          (alt.type === 'BlockStatement' &&
+            alt.body.length === 1 &&
+            (alt.body[0].type === 'ReturnStatement' ||
+              alt.body[0].type === 'ThrowStatement'))
+
+        if (altIsSimpleExit && blockBody && blockBody.length >= 2) {
+          context.report({
+            node,
+            messageId: 'preferEarlyReturn',
+          })
+        }
       },
     }
   },
