@@ -32,5 +32,27 @@
       "Bash(pnpm publish:*)",
       "Bash(gh issue create:*)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm dlx block-no-verify"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__github__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm dlx block-no-verify"
+          }
+        ]
+      }
+    ]
   }
 }
